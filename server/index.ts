@@ -28,7 +28,10 @@ app.use(cookieParser())
 app.use('/api/v1/user',userRoute)
 app.use("/api/v1/restaurant", restaurantRoutes);
 
+
+//Erroe Handler 
 app.use(errorHandler);
+
 const startServer = async () => {
   await connectDB(); 
   app.listen(PORT, () => {
