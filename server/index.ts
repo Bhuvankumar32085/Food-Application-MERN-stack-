@@ -4,11 +4,14 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import connectDB from './db/connectDB'; 
-import userRoute from './route/user.route'
-import restaurantRoutes from './route/restaurant.route'
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser'
 import errorHandler from './middlewares/errorHandler';
+// rounter
+import userRoute from './route/user.route'
+import restaurantRoutes from './route/restaurant.route'
+import menuRoutes from './route/menu.route'
+import orderRoutes from './route/order.route'
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,7 +30,8 @@ app.use(cookieParser())
 //api
 app.use('/api/v1/user',userRoute)
 app.use("/api/v1/restaurant", restaurantRoutes);
-
+app.use('/api/v1/menu',menuRoutes)
+app.use('/api/v1/order',orderRoutes)
 
 //Erroe Handler 
 app.use(errorHandler);
