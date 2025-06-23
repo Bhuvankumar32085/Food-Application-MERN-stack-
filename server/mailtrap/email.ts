@@ -1,89 +1,73 @@
-import { client, sender } from "./mailtrap";
 import {
-  verificationEmailTemplate,
-  welcomeEmailTemplate,
-  passwordResetTemplate,
-  passwordResetSuccessTemplate,
-} from "./htmlEmail";
+  generatePasswordResetEmailHtml,
+  generateResetSuccessEmailHtml,
+  generateWelcomeEmailHtml,
+  htmlContent,
+} from './htmlEmail';
+import { transporter } from './mailtrap'; // ✅ our new SMTP transporter
 
-// 1️⃣ Send Verification Email
-export const verificationEmail = async (
-  email: string,
-  verificationToken: string // 6 digit code
-) => {
-  const recipient = [{ email }];
-  const htmlContent = verificationEmailTemplate(verificationToken);
+const FROM_EMAIL = '"Bhuvan-Food-App" <no-reply@pateleats.com>'; // ✅ custom sender name email hamari real gamai se jago or email tital hoga ye FROM_EMAIL
+
+export const sendVerificationEmail = async (email: string, verificationToken: string) => {
+  const html = htmlContent.replace('{verificationToken}', verificationToken);
 
   try {
-    const res = await client.send({
-      from: sender,
-      to: recipient,
-      subject: "Verify your email",
-      html: htmlContent,
-      category: "Email verification",
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: email,
+      subject: 'Verify your email',
+      html,
     });
   } catch (error) {
-    console.log(error);
-    throw new Error("Failed to send email verification");
+    console.error(error);
+    throw new Error('Failed to send email verification');
   }
 };
 
-// 2️⃣ Send Welcome Email
-export const sendWelcomEmail = async (email: string, name: string) => {
-  const recipient = [{ email }];
-  const htmlContent = welcomeEmailTemplate(name);
+export const sendWelcomeEmail = async (email: string, name: string) => {
+  const html = generateWelcomeEmailHtml(name);
 
   try {
-    const res = await client.send({
-      from: sender,
-      to: recipient,
-      subject: "Welcome to Food Application",
-      html: htmlContent,
-      category: "Welcome Email",
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: email,
+      subject: 'Welcome to Bhuvan-Food-App',
+      html,
     });
   } catch (error) {
-    console.log(error);
-    throw new Error("Failed to send welcome email");
+    console.error(error);
+    throw new Error('Failed to send welcome email');
   }
 };
 
-// 3️⃣ Send Password Reset Email
-export const sendPasswordResetEmail = async (
-  email: string,
-  resetURL: string
-) => {
-  const recipient = [{ email }];
-  const htmlContent = passwordResetTemplate(resetURL);
+export const sendPasswordResetEmail = async (email: string, resetURL: string) => {
+  const html = generatePasswordResetEmailHtml(resetURL);
 
   try {
-    const res = await client.send({
-      from: sender,
-      to: recipient,
-      subject: "Reset your password",
-      html: htmlContent,
-      category: "Reset password",
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: email,
+      subject: 'Reset your password',
+      html,
     });
   } catch (error) {
-    console.log(error);
-    throw new Error("Failed to send password reset email");
+    console.error(error);
+    throw new Error('Failed to send password reset email');
   }
 };
 
-// 4️⃣ Send Password Reset Success Email
-export const sendResetSuccessEmail = async (email: string, name: string) => {
-  const recipient = [{ email }];
-  const htmlContent = passwordResetSuccessTemplate(name);
+export const sendResetSuccessEmail = async (email: string) => {
+  const html = generateResetSuccessEmailHtml();
 
   try {
-    const res = await client.send({
-      from: sender,
-      to: recipient,
-      subject: "Password Reset Successful",
-      html: htmlContent,
-      category: "Password Reset",
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: email,
+      subject: 'Password Reset Successfully',
+      html,
     });
   } catch (error) {
-    console.log(error);
-    throw new Error("Failed to send password reset success email");
+    console.error(error);
+    throw new Error('Failed to send password reset success email');
   }
 };

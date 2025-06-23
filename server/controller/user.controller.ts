@@ -6,16 +6,17 @@ import cloudinary from "../utils/cloudinary";
 import { generateVerificationCode } from "../utils/generateVerificationCode";
 import { generateToken } from "../utils/generateToken";
 import {
-  verificationEmail,
-  sendWelcomEmail,
   sendPasswordResetEmail,
   sendResetSuccessEmail,
+  sendVerificationEmail,
+  sendWelcomeEmail,
 } from "../mailtrap/email";
 
 // ✅ Signup Controller
 export const signup = async (req: Request, res: Response) => {
   const { fullname, email, password, contact } = req.body;
 
+  console.log(req.body);
   // Check if user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -42,7 +43,7 @@ export const signup = async (req: Request, res: Response) => {
   await newUser.save();
 
   generateToken(res, newUser);
-  await verificationEmail(email, verificationToken);
+  await sendVerificationEmail(email, verificationToken);
 
   const userWithoutPassword = await User.findOne({ email }).select("-password");
   // ✅ Respond success
@@ -74,6 +75,7 @@ export const login = async (req: Request, res: Response) => {
 
   generateToken(res, user);
 
+
   user.lastLogin = new Date();
   await user.save();
 
@@ -87,9 +89,9 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
-  const { verificationCode } = req.body;
+  console.log("Verification Code:", req.body.otp.join(''));
   const user = await User.findOne({
-    verificationToken: verificationCode,
+    verificationToken: req.body.otp.join(''),
     verificationTokenExpiresAt: { $gt: new Date() },
   }).select("-password");
 
@@ -105,7 +107,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
   user.verificationTokenExpiresAt = undefined;
   await user.save();
 
-   await sendWelcomEmail(user.email,user.fullname)
+  await sendWelcomeEmail(user.email, user.fullname);
 
   // ✅ Respond success
   return res.status(201).json({
@@ -122,8 +124,7 @@ export const logout = async (req: Request, res: Response) => {
   });
 };
 
-
-//yaha email aagi or hum us eamil pe link send karege 
+//yaha email aagi or hum us eamil pe link send karege
 export const forgotPassword = async (req: Request, res: Response) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
@@ -142,7 +143,10 @@ export const forgotPassword = async (req: Request, res: Response) => {
   await user.save();
 
   //send email
-  await  sendPasswordResetEmail(user.email,`${process.env.FRONTEND_URL}/resetpassword/${resetToken}`)
+  await sendPasswordResetEmail(
+    user.email,
+    `${process.env.FRONTEND_URL}/resetpassword/${resetToken}`
+  );
 
   // ✅ Respond success
   return res.status(201).json({
@@ -150,8 +154,6 @@ export const forgotPassword = async (req: Request, res: Response) => {
     message: "Email verified successfully",
   });
 };
-
-
 
 export const resetPassword = async (req: Request, res: Response) => {
   const { token } = req.params;
@@ -176,7 +178,7 @@ export const resetPassword = async (req: Request, res: Response) => {
   user.save();
 
   // email pe message bhejege ki password change ho gaya
-  await sendResetSuccessEmail(user.email,user.fullname)
+  await  sendResetSuccessEmail(user.email);
 
   // ✅ Respond success
   return res.status(201).json({
@@ -203,7 +205,10 @@ export const checkAuth = async (req: Request, res: Response): Promise<void> => {
   });
 };
 
-export const updateProfile = async (req: Request, res: Response): Promise<void> => {
+export const updateProfile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const userId = req.id;
     const { fullname, email, address, city, country, profilePicture } =
@@ -227,13 +232,13 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
       new: true,
     }).select("-password");
 
-     res.status(200).json({
+    res.status(200).json({
       success: true,
       user,
       message: "Profile updated successfully",
     });
   } catch (error) {
     console.error(error);
-     res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };

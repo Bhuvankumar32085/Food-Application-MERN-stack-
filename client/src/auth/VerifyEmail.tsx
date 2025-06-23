@@ -1,10 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"; // Must use forwardRef!
+import { useUserStore } from "@/store/useUserStore";
 import { Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom"; 
 
 const VerifyEmail = () => {
-  const loading = false;
+  const navigate = useNavigate();
+  const {verifyEmail,loading} = useUserStore();
   const [otp, setOTP] = useState<string[]>(["", "", "", "", "", ""]);
   const inputRef = useRef<(HTMLInputElement | null)[]>([]); // Properly typed
 
@@ -31,13 +34,19 @@ const VerifyEmail = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     const enteredOtp = otp.join("");
 
     if (enteredOtp.length === 6) {
       console.log("OTP Verified:", enteredOtp);
       // ✅ API call yahan karo
+      try {
+        await verifyEmail(otp);
+        navigate("/login");
+      } catch (error) {
+        console.log(error)
+      }
     } else {
       alert("Please enter all 6 characters of the OTP");
     }

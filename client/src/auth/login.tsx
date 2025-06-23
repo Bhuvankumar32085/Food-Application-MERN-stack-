@@ -5,8 +5,10 @@ import { Link } from "react-router-dom";
 import { Loader2, LockKeyhole, Mail } from "lucide-react";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { loginSchema, type LogingType } from "@/schema/userSchema";
+import { useUserStore } from "@/store/useUserStore";
 
 const Login = () => {
+  const { loading, login } = useUserStore();
   const [input, setInput] = useState<LogingType>({
     email: "",
     password: "",
@@ -22,7 +24,7 @@ const Login = () => {
     }));
   };
 
-  const submitHandler = (e: FormEvent) => {
+  const submitHandler = async (e: FormEvent) => {
     e.preventDefault();
 
     //login validation
@@ -34,6 +36,7 @@ const Login = () => {
     }
 
     //api
+    await login(input);
 
     console.log("Form Data:", input);
     // API call starts here
@@ -45,8 +48,6 @@ const Login = () => {
     });
     setErrors({});
   };
-
-  const loading = false;
 
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -107,9 +108,12 @@ const Login = () => {
             </Button>
           )}
           <div className="mt-3 text-center">
-              <Link to="/forgot-password" className="hover:text-blue-500 hover:underline">
-                Forgot Password
-              </Link>
+            <Link
+              to="/forgot-password"
+              className="hover:text-blue-500 hover:underline"
+            >
+              Forgot Password
+            </Link>
           </div>
         </div>
 
