@@ -42,10 +42,13 @@ export const createReaturent = async (req: Request, res: Response) => {
 };
 
 export const getReataurant = async (req: Request, res: Response) => {
-  const restaurant = await Restaurant.find({ user: req.id });
+  const restaurant = await Restaurant.findOne({ user: req.id }).populate(
+    "menus"
+  );
   if (!restaurant) {
     return res.status(201).json({
       success: false,
+      restaurant: [],
       message: "Restaurant not found",
     });
   }
@@ -68,12 +71,23 @@ export const updateRestauran = async (req: Request, res: Response) => {
       message: "Restaurant not found",
     });
   }
+  let cuisinesArray: string[] = [];
+  try {
+    cuisinesArray =
+      typeof cuisines === "string"
+        ? JSON.parse(cuisines)
+        : Array.isArray(cuisines)
+        ? cuisines
+        : [];
+  } catch (error) {
+    cuisinesArray = cuisines.split(","); // fallback if JSON.parse fails
+  }
 
   restaurant.restaurantName = restaurantName;
   restaurant.city = city;
   restaurant.country = country;
   restaurant.deliveryTime = deliveryTime;
-  restaurant.cuisines = JSON.parse(cuisines);
+  restaurant.cuisines = cuisinesArray;
   if (file) {
     const imageUrl = await uploadImageOnCloudinary(file as Express.Multer.File);
     restaurant.imageUrl = imageUrl;

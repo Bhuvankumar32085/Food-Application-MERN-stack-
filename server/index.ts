@@ -9,9 +9,9 @@ import cookieParser from 'cookie-parser'
 import errorHandler from './middlewares/errorHandler';
 // rounter
 import userRoute from './route/user.route'
-import restaurantRoutes from './route/restaurant.route'
 import menuRoutes from './route/menu.route'
 import orderRoutes from './route/order.route'
+import restaurantRoutes from './route/restaurant.route'
 
 const app = express();
 const PORT = process.env.PORT || 3000;

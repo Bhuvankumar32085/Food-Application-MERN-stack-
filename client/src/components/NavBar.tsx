@@ -41,10 +41,10 @@ import {
 import { Avatar } from "@radix-ui/react-avatar";
 import { AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Separator } from "./ui/separator";
+import { useUserStore } from "@/store/useUserStore";
 
 const NavBar = () => {
-  const admin = true;
-  const loading = false;
+  const { user, loading,logout } = useUserStore();
   return (
     <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between h-14">
@@ -56,7 +56,7 @@ const NavBar = () => {
             <Link to="/">Home</Link>
             <Link to="/profile">Profile</Link>
             <Link to="/order">Order</Link>
-            {admin && (
+            {user?.admin && (
               <Menubar>
                 <MenubarMenu>
                   <MenubarTrigger>Dashboard</MenubarTrigger>
@@ -114,7 +114,7 @@ const NavBar = () => {
                 Please wait
               </Button>
             ) : (
-              <Button className="orange">Logout</Button>
+              <Button onClick={logout} className="orange">Logout</Button>
             )}
           </div>
         </div>
@@ -130,6 +130,7 @@ const NavBar = () => {
 export default NavBar;
 
 const MobileNevbar = () => {
+  const { user,logout } = useUserStore();
   return (
     <Sheet>
       <SheetTrigger>
@@ -175,27 +176,31 @@ const MobileNevbar = () => {
             <ShoppingCart />
             <span>Cart(0)</span>
           </Link>
-          <Link
-            to="/admin/menu"
-            className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900"
-          >
-            <SquareMenu />
-            <span>Menu</span>
-          </Link>
-          <Link
-            to="/admin/restaurant"
-            className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900"
-          >
-            <UtensilsCrossed />
-            <span>Restaurant</span>
-          </Link>
-          <Link
-            to="/admin/order"
-            className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900"
-          >
-            <PackageCheck />
-            <span>Restaurant Order</span>
-          </Link>
+          {user?.admin && (
+            <>
+              <Link
+                to="/admin/menu"
+                className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900"
+              >
+                <SquareMenu />
+                <span>Menu</span>
+              </Link>
+              <Link
+                to="/admin/restaurant"
+                className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900"
+              >
+                <UtensilsCrossed />
+                <span>Restaurant</span>
+              </Link>
+              <Link
+                to="/admin/order"
+                className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900"
+              >
+                <PackageCheck />
+                <span>Restaurant Order</span>
+              </Link>
+            </>
+          )}
         </SheetDescription>
         <SheetFooter className="flex flex-col gap-2">
           <div className="flex flex-row items-center gap-2  p-3">
@@ -208,7 +213,7 @@ const MobileNevbar = () => {
 
           <SheetClose asChild>
             <div className="w-full p-3">
-              <Button type="submit" className="orange w-full">
+              <Button onClick={logout} type="submit" className="orange w-full">
                 Logout
               </Button>
             </div>

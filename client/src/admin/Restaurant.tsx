@@ -2,14 +2,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-menubar";
 import { Loader2 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { RestaurantFormSchema } from "@/schema/restaurantSchema";
-
+import { useRestaurantStore } from "@/store/useRestaurantStore";
 import { restaurantFromSchema } from "@/schema/restaurantSchema";
 
 const Restaurant = () => {
-  const loading = false;
-  const resturantExists = false;
+  const {
+    loading,
+    createRestaurant,
+    restaurant,
+    updateRestaurant,
+    getRestaurant,
+  } = useRestaurantStore();
   const [error, setError] = useState<Partial<RestaurantFormSchema>>({});
 
   const [input, setInput] = useState<RestaurantFormSchema>({
@@ -26,7 +31,7 @@ const Restaurant = () => {
     setInput({ ...input, [name]: type === "number" ? Number(value) : value });
   };
 
-  const sumbitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const sumbitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = restaurantFromSchema.safeParse(input);
     if (!result.success) {
@@ -38,13 +43,53 @@ const Restaurant = () => {
     }
 
     // api implementations
-    console.log(input);
+    try {
+      const formData = new FormData(); //form data for image upload because we passing image
+      formData.append("restaurantName", input.restaurantName);
+      formData.append("city", input.city);
+      formData.append("country", input.country);
+      formData.append("deliveryTime", input.deliveryTime.toString());
+      formData.append("cuisines", JSON.stringify(input.cuisines));
+      if (input.image) {
+        formData.append("image", input.image);
+      }
+
+      if (restaurant) {
+        console.log("Updating restaurant...");
+        await updateRestaurant(input);
+      } else {
+        await createRestaurant(formData);
+      }
+    } catch (error) {
+      console.error("Error submitting restaurant form:", error);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setInput({ ...input, image: file || undefined });
   };
+
+   useEffect(() => {
+    const fetchRestaurant = async () => {
+      await getRestaurant();
+      if(restaurant){
+        setInput({
+          restaurantName: restaurant.restaurantName || "",
+          city: restaurant.city || "",
+          country: restaurant.country || "",
+          deliveryTime: restaurant.deliveryTime || 0,
+          cuisines: restaurant.cuisines
+            ? restaurant.cuisines.map((cuisine: string) => cuisine)
+            : [],
+          image: undefined,
+        });
+      };
+      }
+    fetchRestaurant();
+    // console.log(restaurant);
+    
+  }, []);
 
   return (
     <div className="max-w-6xl mx-auto my-10">
@@ -155,9 +200,7 @@ const Restaurant = () => {
                 </Button>
               ) : (
                 <Button className="orange">
-                  {resturantExists
-                    ? "Edit Your Restaurant"
-                    : " Add Your Restauran"}
+                  {restaurant ? "Edit Your Restaurant" : " Add Your Restauran"}
                 </Button>
               )}
             </div>

@@ -149,7 +149,9 @@ export const useUserStore = create<UserState>()(
       logout: async () => {
         try {
           set({ loading: true });
-          const response = await axios.post(`${API_END_POINT}/logout`);
+          const response = await axios.post(`${API_END_POINT}/logout`,{},{
+            withCredentials: true 
+          });
           if (response.data.success) {
             console.log("Logout successful:", response.data);
             toast.success(response.data.message);

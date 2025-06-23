@@ -6,8 +6,10 @@ import { Loader2, LockKeyhole, Mail } from "lucide-react";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { loginSchema, type LogingType } from "@/schema/userSchema";
 import { useUserStore } from "@/store/useUserStore";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate= useNavigate();
   const { loading, login } = useUserStore();
   const [input, setInput] = useState<LogingType>({
     email: "",
@@ -36,9 +38,13 @@ const Login = () => {
     }
 
     //api
-    await login(input);
+    try {
+      await login(input);
+      navigate('/')
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
 
-    console.log("Form Data:", input);
     // API call starts here
 
     // Reset input and errors
