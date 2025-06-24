@@ -19,7 +19,6 @@ import { useUserStore } from "./store/useUserStore";
 import { Navigate } from "react-router-dom";
 import { useEffect } from "react";
 
-
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const {isAuthenticated, user} = useUserStore();
   if(!isAuthenticated){

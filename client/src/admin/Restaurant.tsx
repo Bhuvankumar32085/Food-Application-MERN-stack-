@@ -15,6 +15,7 @@ const Restaurant = () => {
     updateRestaurant,
     getRestaurant,
   } = useRestaurantStore();
+  // const loading=false
   const [error, setError] = useState<Partial<RestaurantFormSchema>>({});
 
   const [input, setInput] = useState<RestaurantFormSchema>({
@@ -87,7 +88,7 @@ const Restaurant = () => {
       };
       }
     fetchRestaurant();
-    // console.log(restaurant);
+    // console.log('resturant ====>>',restaurant);
     
   }, []);
 

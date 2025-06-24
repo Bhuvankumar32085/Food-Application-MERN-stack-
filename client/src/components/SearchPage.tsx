@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import FilterPage from "./FilterPage";
 import { Input } from "./ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Globe, MapPin, X } from "lucide-react";
@@ -9,10 +9,19 @@ import { Card, CardContent, CardFooter } from "./ui/card";
 import { AspectRatio } from "./ui/aspect-ratio";
 import heroimg from "@/assets/hero_pizza.png";
 import { Skeleton } from "./ui/skeleton";
+import { useRestaurantStore } from "@/store/useRestaurantStore";
+import type { Restaurant } from "@/types/resturantType";
 
 const SearchPage = () => {
   const params = useParams();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const { searchRestaurant, appliedFilter, searchedRestaurant } =
+    useRestaurantStore();
+
+  useEffect(() => {
+    searchRestaurant(params.text!, searchQuery, appliedFilter);
+    console.log(searchedRestaurant);
+  }, [appliedFilter, params.text!]);
 
   return (
     <div className="max-w-7xl mx-auto my-10">
@@ -32,7 +41,7 @@ const SearchPage = () => {
           {/* Search Item display hear */}
           <div>
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-2 my-3">
-              <h1 className="font-medium text-lg">(2) Search result found</h1>
+              <h1 className="font-medium text-lg"></h1>
               <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
                 {["biryani", "momose", "jalebi"].map(
                   (selectedFilter: string, idx: number) => (
@@ -57,8 +66,11 @@ const SearchPage = () => {
             </div>
             {/* restaurant card */}
             <div className="grid md:grid-cols-3 gap-4">
-              {[1, 2, 3].map((item: number, idx: number) => (
-                <Card className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+              {searchedRestaurant?.data.map((item: Restaurant, idx: number) => (
+                <Card
+                  key={idx}
+                  className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300"
+                >
                   <div className="relative">
                     <AspectRatio ratio={16 / 9}>
                       <img
@@ -76,22 +88,23 @@ const SearchPage = () => {
 
                   <CardContent className="p-4">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                      Pizza Hunt
+                      {item.restaurantName}
                     </h1>
                     <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
                       <MapPin size={16} />
                       <p className="text-sm">
-                        City: <span className="font-medium">Delhi</span>
+                        City: <span className="font-medium">{item.city}</span>
                       </p>
                     </div>
                     <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
                       <Globe size={16} />
                       <p className="text-sm">
-                        Countery: <span className="font-medium">India</span>
+                        Countery:{" "}
+                        <span className="font-medium">{item.country}</span>
                       </p>
                     </div>
                     <div className="flex gap-2 mt-4 flex-wrap">
-                      {["a", "b", "c"].map((cuisine: string, idx: number) => (
+                      {item.cuisines.map((cuisine: string, idx: number) => (
                         <Badge
                           key={idx}
                           className="font-medium px-2 py-1 rounded-full shadow-sm"
@@ -155,7 +168,6 @@ const SearchPageSkeleton = () => {
     </>
   );
 };
-
 
 const NoResultFound = ({ searchText }: { searchText: string }) => {
   return (

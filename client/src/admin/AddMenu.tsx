@@ -15,29 +15,15 @@ import React, { useState } from "react";
 import EditMenu from "./EditMenu";
 import { menuSchema } from "@/schema/menuSchema";
 import type { MenuSchema } from "@/schema/menuSchema";
+import { useMenuSrore } from "@/store/useMenuStore";
+import { useRestaurantStore } from "@/store/useRestaurantStore";
 
-const menu = [
-  {
-    name: "Biryani",
-    description:
-      "lokdjkh kj jfhfk gfsaghdfjhegfgkjl kr reg fesf lhs fghe fheg fefg ",
-    price: 80,
-    image:
-      "https://img.freepik.com/free-photo/chicken-wings-barbecue-sweetly-sour-sauce-picnic-summer-menu-tasty-food-top-view-flat-lay_2829-6471.jpg",
-  },
-  {
-    name: "Momose",
-    description: "Mast beg momo in your city and i give you my best",
-    price: 20,
-    image:
-      "https://img.freepik.com/free-photo/chicken-wings-barbecue-sweetly-sour-sauce-picnic-summer-menu-tasty-food-top-view-flat-lay_2829-6471.jpg",
-  },
-];
 
 const AddMenu = () => {
+  const {restaurant,getRestaurant}=useRestaurantStore()
+  const { createMenu,loading } = useMenuSrore()
   const [open, setOpen] = useState<boolean>(false);
   const [editOpen, setEditOpen] = useState<boolean>(false);
-  const loading = false;
   const [selectedMenu, SetSelectedMenu] = useState<any>();
   const [error, setError] = useState<Partial<MenuSchema>>({});
   const [input, setInput] = useState<MenuSchema>({
@@ -56,7 +42,7 @@ const AddMenu = () => {
     setInput({ ...input, image: e.target.files?.[0] || undefined });
   };
 
-  const formSumbitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const formSumbitHandler = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = menuSchema.safeParse(input);
     if (!result.success) {
@@ -66,7 +52,23 @@ const AddMenu = () => {
     }
     console.log(input);
     //api implementations
+    const formData = new FormData();
+    formData.append("name", input.name);
+    formData.append("description", input.description);
+    formData.append("price", String(input.price));
+    if (input.image) {
+      formData.append("image", input.image);
+    }
+    try {
+      await createMenu(formData);
+      await getRestaurant()
+    } catch (error) {
+      console.error("Error creating menu:", error);
+      setError({ name: "Failed to create menu. Please try again." });
+    }
+
   };
+
 
   return (
     <div className="max-w-6xl mx-auto my-10">
@@ -163,7 +165,7 @@ const AddMenu = () => {
           </DialogContent>
         </Dialog>
       </div>
-      {menu.map((item: any, idx: number) => (
+      {restaurant.menus.map((item: any, idx: number) => (
         <div key={idx} className="mt-6 space-y-4">
           <div className="flex p-2 flex-col md:flex-row md:items-center md:space-x-4 shadow-md rounded-lg border">
             <img

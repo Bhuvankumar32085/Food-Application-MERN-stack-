@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { type LogingType, type SignupType } from "@/schema/userSchema";
 const API_END_POINT = "http://localhost:8000/api/v1/user";
 axios.defaults.baseURL = API_END_POINT;
+axios.defaults.withCredentials=true
 
 type User={
   fullName: string;
@@ -154,7 +155,8 @@ export const useUserStore = create<UserState>()(
           });
           if (response.data.success) {
             console.log("Logout successful:", response.data);
-            toast.success(response.data.message);
+             toast.success(response.data.message);
+          
             set({
               user: null,
               loading: false,

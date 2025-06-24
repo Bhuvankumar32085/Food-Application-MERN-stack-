@@ -46,7 +46,7 @@ export const getReataurant = async (req: Request, res: Response) => {
     "menus"
   );
   if (!restaurant) {
-    return res.status(201).json({
+    return res.status(404).json({
       success: false,
       restaurant: [],
       message: "Restaurant not found",
@@ -104,6 +104,7 @@ export const updateRestauran = async (req: Request, res: Response) => {
 
 export const getRestaurantOrder = async (req: Request, res: Response) => {
   const restaurant = await Restaurant.findOne({ user: req.id });
+  console.log(req.id)
   if (!restaurant) {
     return res.status(201).json({
       success: false,
@@ -140,44 +141,48 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
     success: true,
     message: "status updated",
   });
+  
 };
 
 export const searchRestaursnt = async (req: Request, res: Response) => {
-  const searchText = req.params.searchText || "";
-  const searchQuery = (req.query.searchQuery as string) || "";
-  const selectedCuisines = ((req.query.selectedCuisines as string) || "")
-    .split(",")
-    .filter((cuisine) => cuisine);
-  const query: any = {};
-  //basic search based on searctText (name city country)
-  if (searchText) {
-    query.$or = [
-      { restaurantName: { $regex: searchText, $options: "i" } },
-      { city: { $regex: searchText, $options: "i" } },
-      { country: { $regex: searchText, $options: "i" } },
-    ];
-  }
+    try {
+        const searchText = req.params.searchText || "";
+        const searchQuery = req.query.searchQuery as string || "";
+        const selectedCuisines = (req.query.selectedCuisines as string || "").split(",").filter(cuisine => cuisine);
+        const query: any = {};
+      
+        // console.log(searchQuery,selectedCuisines,searchText)
+      
+        if (searchText) {
+            query.$or = [
+                { restaurantName: { $regex: searchText, $options: 'i' } },
+                { city: { $regex: searchText, $options: 'i' } },
+                { country: { $regex: searchText, $options: 'i' } },
+            ]
+        }
 
-  // Filter by cuisines
-  if (searchQuery) {
-    query.$or = [
-      { restaurantName: { $regex: searchText, $options: "i" } },
-      { cuisines: { $regex: searchQuery, $options: "i" } },
-    ];
-  }
-  // console.log(query)
-
-  if (selectedCuisines.length > 0) {
-    query.cuisines = { $in: selectedCuisines };
-  }
-
-  const restaurants = await Restaurant.find(query);
-
-  return res.status(200).json({
-    success: true,
-    data: restaurants,
-  });
-};
+        if (searchQuery) {
+            query.$or = [
+                { restaurantName: { $regex: searchQuery, $options: 'i' } },
+                { cuisines: { $regex: searchQuery, $options: 'i' } }
+            ]
+        }
+        
+        if(selectedCuisines.length > 0){
+            query.cuisines = {$in:selectedCuisines}
+        }
+        
+        const restaurants = await Restaurant.find(query);
+        // console.log(restaurants)
+        return res.status(200).json({
+            success:true,
+            data:restaurants
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: "Internal server error" })
+    }
+}
 
 export const getSingleRestaurant = async (req: Request, res: Response) => {
   const restaurantId = req.params.id;

@@ -13,6 +13,8 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useState, type Dispatch } from "react";
 import { menuSchema } from "@/schema/menuSchema";
 import type { MenuSchema } from "@/schema/menuSchema";
+import { useMenuSrore } from "@/store/useMenuStore";
+import { useRestaurantStore } from "@/store/useRestaurantStore";
 
 const EditMenu = ({
   selectedMenu,
@@ -23,8 +25,9 @@ const EditMenu = ({
   editOpen: boolean;
   setEditOpen: Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const { editMenu, loading } = useMenuSrore();
+  const {getRestaurant}= useRestaurantStore();
   const [error, setError] = useState<Partial<MenuSchema>>({});
-  const loading = false;
   const [input, setInput] = useState<MenuSchema>({
     name: "",
     description: "",
@@ -32,7 +35,7 @@ const EditMenu = ({
     image: undefined,
   });
 
-  const formSumbitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+  const formSumbitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = menuSchema.safeParse(input);
     if (!result.success) {
@@ -40,8 +43,21 @@ const EditMenu = ({
       setError(fieldError as Partial<MenuSchema>);
       return;
     }
-    console.log(input);
+
     // api implementations
+    try {
+      const formData = new FormData();
+      formData.append("name", input.name);
+      formData.append("description", input.description);
+      formData.append("price", input.price.toString());
+      if (input.image) {
+        formData.append("image", input.image);
+      }
+      await editMenu(selectedMenu._id, formData);
+      await getRestaurant();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,7 +139,7 @@ const EditMenu = ({
             <Input
               type="file"
               name="image"
-              //   value={input.image}
+                // value={input.image}
               onChange={changeFileHandler}
               accept="image/*"
             />

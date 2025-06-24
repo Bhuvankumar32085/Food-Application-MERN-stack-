@@ -189,7 +189,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
 export const checkAuth = async (req: Request, res: Response): Promise<void> => {
   const userId = req.id;
-
+  // console.log('checkAuth----->',userId)
   const user = await User.findById(userId).select("-password");
   if (!user) {
     res.status(404).json({
