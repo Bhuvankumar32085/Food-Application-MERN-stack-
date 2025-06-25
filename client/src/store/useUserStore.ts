@@ -5,9 +5,9 @@ import { toast } from "sonner";
 import { type LogingType, type SignupType } from "@/schema/userSchema";
 const API_END_POINT = "http://localhost:8000/api/v1/user";
 axios.defaults.baseURL = API_END_POINT;
-axios.defaults.withCredentials=true
+axios.defaults.withCredentials = true;
 
-type User={
+type User = {
   fullName: string;
   email: string;
   contact: number;
@@ -17,7 +17,7 @@ type User={
   prfilePicture: string;
   admin: boolean;
   isVerified: boolean;
-}
+};
 
 type UserState = {
   user: null | User; // Define the type of user based on your application
@@ -51,7 +51,7 @@ export const useUserStore = create<UserState>()(
             headers: {
               "Content-Type": "application/json",
             },
-             withCredentials: true,
+            withCredentials: true,
           });
           if (response.data.success) {
             console.log("Signup successful:", response.data);
@@ -78,7 +78,7 @@ export const useUserStore = create<UserState>()(
             headers: {
               "Content-Type": "application/json",
             },
-             withCredentials: true,
+            withCredentials: true,
           });
           if (response.data.success) {
             console.log("Login successful:", response.data);
@@ -128,7 +128,9 @@ export const useUserStore = create<UserState>()(
       checkAuntgentication: async () => {
         try {
           set({ isCheckingAuth: true });
-          const response = await axios.get(`${API_END_POINT}/check-auth`,{ withCredentials: true,});
+          const response = await axios.get(`${API_END_POINT}/check-auth`, {
+            withCredentials: true,
+          });
           if (response.data.success) {
             set({
               user: response.data.user,
@@ -150,13 +152,17 @@ export const useUserStore = create<UserState>()(
       logout: async () => {
         try {
           set({ loading: true });
-          const response = await axios.post(`${API_END_POINT}/logout`,{},{
-            withCredentials: true 
-          });
+          const response = await axios.post(
+            `${API_END_POINT}/logout`,
+            {},
+            {
+              withCredentials: true,
+            }
+          );
           if (response.data.success) {
             console.log("Logout successful:", response.data);
-             toast.success(response.data.message);
-          
+            toast.success(response.data.message);
+
             set({
               user: null,
               loading: false,
@@ -223,7 +229,6 @@ export const useUserStore = create<UserState>()(
       // update profile api implementation start here
       updateProfile: async (input: any) => {
         try {
-          set({ loading: true });
           const response = await axios.put(
             `${API_END_POINT}/profile/update`,
             input,
@@ -238,12 +243,10 @@ export const useUserStore = create<UserState>()(
             toast.success(response.data.message);
             set({
               user: response.data.user,
-              loading: false,
               isAuthenticated: true,
             });
           }
         } catch (error) {
-          set({ loading: false });
           console.error(error);
           toast.error("Profile update failed");
         }

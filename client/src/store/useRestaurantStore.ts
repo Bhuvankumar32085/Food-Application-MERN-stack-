@@ -7,16 +7,14 @@ import type { RestaurantState } from "@/types/resturantType";
 const API_ENDPOINT = "http://localhost:8000/api/v1/restaurant";
 axios.defaults.withCredentials = true; // Enable sending cookies with requests
 
-
-
-
 export const useRestaurantStore = create<RestaurantState>()(
   persist(
     (set) => ({
       loading: false,
       restaurant: null,
       searchedRestaurant: null,
-      appliedFilter:[],
+      appliedFilter: [],
+      singleRestaurant:null,
       createRestaurant: async (formData: FormData) => {
         try {
           set({ loading: true });
@@ -88,7 +86,7 @@ export const useRestaurantStore = create<RestaurantState>()(
           );
           if (response.data.success) {
             set({ loading: false, searchedRestaurant: response.data }); // Set the search results in the store
-            toast.success("Search completed successfully!"); // Show success message
+            // toast.success("Search completed successfully!"); // Show success message
           }
         } catch (error) {
           set({ loading: false });
@@ -98,21 +96,34 @@ export const useRestaurantStore = create<RestaurantState>()(
         }
       },
 
-      setAppliedFilter:(value:string)=>{
+      setAppliedFilter: (value: string) => {
         set((state) => {
-           const isAleradyApplied=state.appliedFilter.includes(value);
-           const updatedFilter=isAleradyApplied
-             ? state.appliedFilter.filter((filter) => filter !== value)
-             : [...state.appliedFilter, value];
-           return {appliedFilter:updatedFilter};
-        })
+          const isAleradyApplied = state.appliedFilter.includes(value);
+          const updatedFilter = isAleradyApplied
+            ? state.appliedFilter.filter((filter) => filter !== value)
+            : [...state.appliedFilter, value];
+          return { appliedFilter: updatedFilter };
+        });
       },
 
+      resetAppliedFilter: () => {
+        set({ appliedFilter: [] });
+      },
+
+      getSingleRestaurant: async (restaurabtId: string) => {
+        try {
+          const response =await axios.get(`${API_ENDPOINT}/${restaurabtId}`);
+          if(response.data.success){
+              set({singleRestaurant:response.data})
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      },
     }),
     {
       name: "restaurant-storage", // unique name for the storage
       storage: createJSONStorage(() => localStorage), // use localStorage as the storage
-       
     }
   )
 );

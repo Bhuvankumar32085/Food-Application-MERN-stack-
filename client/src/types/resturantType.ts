@@ -1,3 +1,4 @@
+
 export type MenuItem = {
     _id: string;
     name: string;
@@ -26,6 +27,7 @@ export type RestaurantState={
   restaurant:Restaurant| null,
   searchedRestaurant:SearchedRestaurant| null,
   appliedFilter:string[],
+  singleRestaurant:Restaurant | null,
   createRestaurant: (formData: FormData) => Promise<void>,
   getRestaurant: () => Promise<void>,
   updateRestaurant: (formData: FormData) => Promise<void>,
@@ -35,4 +37,6 @@ export type RestaurantState={
     selectedCuisines: any,
   ) => Promise<void>,
   setAppliedFilter: (value: string) => void,
+  resetAppliedFilter:()=>void,
+  getSingleRestaurant:(restaurabtId:string)=>Promise<void>
 }

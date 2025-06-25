@@ -15,12 +15,12 @@ import type { Restaurant } from "@/types/resturantType";
 const SearchPage = () => {
   const params = useParams();
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const { searchRestaurant, appliedFilter, searchedRestaurant } =
+  const { searchRestaurant, appliedFilter, searchedRestaurant, loading ,setAppliedFilter} =
     useRestaurantStore();
 
   useEffect(() => {
     searchRestaurant(params.text!, searchQuery, appliedFilter);
-    console.log(searchedRestaurant);
+    // console.log(searchedRestaurant);
   }, [appliedFilter, params.text!]);
 
   return (
@@ -36,14 +36,17 @@ const SearchPage = () => {
               placeholder="Search by rastaurant & cuisines"
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Button className="orange">Search</Button>
+            <Button
+             onClick={()=>(    searchRestaurant(params.text!, searchQuery, appliedFilter))}
+             className="orange">Search
+            </Button>
           </div>
           {/* Search Item display hear */}
           <div>
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-2 my-3">
               <h1 className="font-medium text-lg"></h1>
               <div className="flex flex-wrap gap-2 mb-4 md:mb-0">
-                {["biryani", "momose", "jalebi"].map(
+                {appliedFilter.map(
                   (selectedFilter: string, idx: number) => (
                     <div
                       key={idx}
@@ -56,6 +59,7 @@ const SearchPage = () => {
                         {selectedFilter}
                       </Badge>
                       <X
+                        onClick={()=>setAppliedFilter(selectedFilter)}
                         className="absolute text-[#D19254] right-1 hover:cursor-pointer"
                         size={16}
                       />
@@ -66,63 +70,72 @@ const SearchPage = () => {
             </div>
             {/* restaurant card */}
             <div className="grid md:grid-cols-3 gap-4">
-              {searchedRestaurant?.data.map((item: Restaurant, idx: number) => (
-                <Card
-                  key={idx}
-                  className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300"
-                >
-                  <div className="relative">
-                    <AspectRatio ratio={16 / 9}>
-                      <img
-                        src={heroimg}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    </AspectRatio>
-                    <div className="absolute top-2 left-2 bg-white dark:bg-gray-700 bg-opacity-75 rounded-lg px-3 py-1">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Featured
-                      </span>
-                    </div>
-                  </div>
+              {loading ? (
+                <SearchPageSkeleton />
+              ) : !loading && searchedRestaurant?.data.length == 0 ? (
+                <NoResultFound searchText={params.text} />
+              ) : (
+                searchedRestaurant?.data.map(
+                  (item: Restaurant, idx: number) => (
+                    <Card
+                      key={idx}
+                      className="bg-white dark:bg-gray-800 shadow-xl rounded-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300"
+                    >
+                      <div className="relative">
+                        <AspectRatio ratio={16 / 9}>
+                          <img
+                            src={heroimg}
+                            alt=""
+                            className="w-full h-full object-cover"
+                          />
+                        </AspectRatio>
+                        <div className="absolute top-2 left-2 bg-white dark:bg-gray-700 bg-opacity-75 rounded-lg px-3 py-1">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Featured
+                          </span>
+                        </div>
+                      </div>
 
-                  <CardContent className="p-4">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                      {item.restaurantName}
-                    </h1>
-                    <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
-                      <MapPin size={16} />
-                      <p className="text-sm">
-                        City: <span className="font-medium">{item.city}</span>
-                      </p>
-                    </div>
-                    <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
-                      <Globe size={16} />
-                      <p className="text-sm">
-                        Countery:{" "}
-                        <span className="font-medium">{item.country}</span>
-                      </p>
-                    </div>
-                    <div className="flex gap-2 mt-4 flex-wrap">
-                      {item.cuisines.map((cuisine: string, idx: number) => (
-                        <Badge
-                          key={idx}
-                          className="font-medium px-2 py-1 rounded-full shadow-sm"
-                        >
-                          {cuisine}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="p-4 border-t dark:border-t-gray-700 border-t-gray-100 text-white flex justify-end">
-                    <Link to={`/restaurant/${"id"}`}>
-                      <Button className="orange font-semibold py-2 px-4 rounded-full shadow-md transition-colors duration-200">
-                        View Menus
-                      </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
-              ))}
+                      <CardContent className="p-4">
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                          {item.restaurantName}
+                        </h1>
+                        <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
+                          <MapPin size={16} />
+                          <p className="text-sm">
+                            City:{" "}
+                            <span className="font-medium">{item.city}</span>
+                          </p>
+                        </div>
+                        <div className="mt-2 gap-1 flex items-center text-gray-600 dark:text-gray-400">
+                          <Globe size={16} />
+                          <p className="text-sm">
+                            Countery:{" "}
+                            <span className="font-medium">{item.country}</span>
+                          </p>
+                        </div>
+                        <div className="flex gap-2 mt-4 flex-wrap">
+                          {item.cuisines.map((cuisine: string, idx: number) => (
+                            <Badge
+                              key={idx}
+                              className="font-medium px-2 py-1 rounded-full shadow-sm"
+                            >
+                              {cuisine}
+                            </Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                      <CardFooter className="p-4 border-t dark:border-t-gray-700 border-t-gray-100 text-white flex justify-end">
+                        <Link to={`/restaurant/${item._id}`}>
+                          <Button className="orange font-semibold py-2 px-4 rounded-full shadow-md transition-colors duration-200">
+                            View Menus
+                          </Button>
+                        </Link>
+                      </CardFooter>
+                    </Card>
+                  )
+                )
+              )}
             </div>
           </div>
         </div>
@@ -180,7 +193,7 @@ const NoResultFound = ({ searchText }: { searchText: string }) => {
         with a different term.
       </p>
       <Link to="/">
-        <Button className="mt-4 bg-orange hover:bg-orangeHover">
+        <Button className="mt-4 orange">
           Go Back to Home
         </Button>
       </Link>

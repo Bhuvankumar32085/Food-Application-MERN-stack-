@@ -42,9 +42,12 @@ import { Avatar } from "@radix-ui/react-avatar";
 import { AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Separator } from "./ui/separator";
 import { useUserStore } from "@/store/useUserStore";
+import { useCartStore } from "@/store/useCartStore";
+import { useEffect } from "react";
 
 const NavBar = () => {
-  const { user, loading,logout } = useUserStore();
+  const { cart } = useCartStore();
+  const { user, loading, logout } = useUserStore();
   return (
     <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between h-14">
@@ -93,16 +96,18 @@ const NavBar = () => {
             </div>
             <Link to="/cart" className="relative cursor-pointer">
               <ShoppingCart className="" />
-              <Button
-                size={"icon"}
-                className="absolute -inset-y-3 left-2 text-xs rounded-full h-4 w-4 bg-red-500 hover:bg-red-700"
-              >
-                5
-              </Button>
+              {cart.length > 0 && (
+                <Button
+                  size={"icon"}
+                  className="absolute -inset-y-3 left-2 text-xs rounded-full h-4 w-4 bg-red-500 hover:bg-red-700"
+                >
+                  {cart.length}
+                </Button>
+              )}
             </Link>
             <div>
-              <Avatar>
-                <AvatarImage />
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={user?.profilePicture} className="w-12 h-12 object-cover rounded-full"/>
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </div>
@@ -114,7 +119,9 @@ const NavBar = () => {
                 Please wait
               </Button>
             ) : (
-              <Button onClick={logout} className="orange">Logout</Button>
+              <Button onClick={logout} className="orange">
+                Logout
+              </Button>
             )}
           </div>
         </div>
@@ -130,7 +137,12 @@ const NavBar = () => {
 export default NavBar;
 
 const MobileNevbar = () => {
-  const { user,logout } = useUserStore();
+  const { user, logout } = useUserStore();
+  useEffect(()=>{
+     console.log(';;;;',user)
+     console.log(';;;;',user?.profilePicture)
+     console.log(';;;;',user?.fullname)
+  },[])
   return (
     <Sheet>
       <SheetTrigger>
@@ -205,10 +217,10 @@ const MobileNevbar = () => {
         <SheetFooter className="flex flex-col gap-2">
           <div className="flex flex-row items-center gap-2  p-3">
             <Avatar>
-              <AvatarImage />
+              <AvatarImage src={user?.profilePicture} className="w-14 h-14 object-cover rounded-full"/>
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <h1 className="font-bold">bhuvan</h1>
+            <h1 className="font-bold">{user?.fullname}</h1>
           </div>
 
           <SheetClose asChild>

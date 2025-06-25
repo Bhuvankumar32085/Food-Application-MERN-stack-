@@ -11,21 +11,24 @@ import { useRef, useState, type FormEvent } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
+import { useUserStore } from "@/store/useUserStore";
 
 const Profile = () => {
-  const loading = false;
+  const { user, updateProfile } = useUserStore();
+  const [isLoading, setIsLoading] = useState(false);
   const imageRef = useRef<HTMLInputElement | null>(null);
   const [profileData, setProfileData] = useState({
-    fullname: "",
-    email: "",
-    address: "",
-    city: "",
-    country: "",
-    profilePicture: "",
+    fullname: user?.fullname || "",
+    email: user?.email || "",
+    address: user?.address || "",
+    city: user?.city || "",
+    country: user?.country || "",
+    profilePicture: user?.profilePicture || "",
   });
 
-  const [selectedProfilePicture, setSelectedProfilePicture] =
-    useState<string>("");
+  const [selectedProfilePicture, setSelectedProfilePicture] = useState<string>(
+    profileData.profilePicture || ""
+  );
   //   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fileChandeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,13 +52,25 @@ const Profile = () => {
     setProfileData({ ...profileData, [name]: value });
   };
 
-  const updateProfileHandler = (e: FormEvent<HTMLFormElement>) => {
+  const updateProfileHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // api implementations
+
+    //  console.log(profileData)
+    try {
+      setIsLoading(true);
+      await updateProfile(profileData);
+      setIsLoading(false);
+    } catch{
+      setIsLoading(false);
+    }
   };
 
   return (
-    <form onSubmit={updateProfileHandler} className="max-w-7xl mx-auto my-5 p-3">
+    <form
+      onSubmit={updateProfileHandler}
+      className="max-w-7xl mx-auto my-5 p-3"
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar className="realtive md:w-28 md:h-28 w-20 h-20">
@@ -90,6 +105,7 @@ const Profile = () => {
           <div className="w-full">
             <Label>Email</Label>
             <input
+              disabled
               name="email"
               value={profileData.email}
               onChange={changehangler}
@@ -135,7 +151,7 @@ const Profile = () => {
         </div>
       </div>
       <div className="text-center">
-        {loading ? (
+        {isLoading ? (
           <Button disabled className="orange">
             <Loader2 className="mr-2 w-4 h-4 animate-spin" />
             Please wait

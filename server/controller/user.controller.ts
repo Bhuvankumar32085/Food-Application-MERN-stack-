@@ -214,6 +214,7 @@ export const updateProfile = async (
     const { fullname, email, address, city, country, profilePicture } =
       req.body;
 
+      // console.log(req.body)
     // ✅ Upload image to Cloudinary
     const cloudResponse = await cloudinary.uploader.upload(profilePicture);
 
