@@ -15,6 +15,8 @@ type CartState = {
   decrementQuenty: (id: string) => void;
 };
 
+
+
 export const useCartStore = create<CartState>()(
   persist(
     (set) => ({

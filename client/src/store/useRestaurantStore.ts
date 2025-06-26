@@ -3,18 +3,21 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import axios from "axios";
 import { toast } from "sonner";
 import type { RestaurantState } from "@/types/resturantType";
+import type { Orders } from "@/types/orderType";
 
 const API_ENDPOINT = "http://localhost:8000/api/v1/restaurant";
 axios.defaults.withCredentials = true; // Enable sending cookies with requests
 
 export const useRestaurantStore = create<RestaurantState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       loading: false,
       restaurant: null,
       searchedRestaurant: null,
       appliedFilter: [],
-      singleRestaurant:null,
+      singleRestaurant: null,
+      restaurantOrders: [],
+
       createRestaurant: async (formData: FormData) => {
         try {
           set({ loading: true });
@@ -112,12 +115,49 @@ export const useRestaurantStore = create<RestaurantState>()(
 
       getSingleRestaurant: async (restaurabtId: string) => {
         try {
-          const response =await axios.get(`${API_ENDPOINT}/${restaurabtId}`);
-          if(response.data.success){
-              set({singleRestaurant:response.data})
+          const response = await axios.get(`${API_ENDPOINT}/${restaurabtId}`);
+          if (response.data.success) {
+            set({ singleRestaurant: response.data });
           }
         } catch (error) {
-          console.log(error)
+          console.log(error);
+        }
+      },
+
+      getReataurantOrdes: async () => {
+        try {
+          const response = await axios.get(`${API_ENDPOINT}/order`);
+          if (response.data.success) {
+            set({ restaurantOrders: response.data.orders });
+          }
+        } catch (e) {
+          console.log(e);
+        }
+      },
+
+      updateRestaurantOrder: async (orderId: string, status: string) => {
+        try {
+          const response = await axios.put(
+            `${API_ENDPOINT}/order/${orderId}/status`,
+            { status },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          if (response.data.success) {
+            const udatedOrder = get().restaurantOrders.map((order: Orders) => {
+              return order._id === orderId
+                ? { ...order, status: response.data.status }
+                : order;
+            });
+            set({ restaurantOrders: udatedOrder });
+            toast.success(response.data.message);
+          }
+        } catch (e: any) {
+          console.log(e);
+          toast.error(e.response.data.message);
         }
       },
     }),

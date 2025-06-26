@@ -12,6 +12,8 @@ import userRoute from './route/user.route'
 import menuRoutes from './route/menu.route'
 import orderRoutes from './route/order.route'
 import restaurantRoutes from './route/restaurant.route'
+import { stripeWebhook } from './controller/order.controller';
+import asyncWrapper from './middlewares/asyncWrapper';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,9 +25,11 @@ app.use(cors({
 }));
 
 
+app.post('/api/v1/order/webhook', express.raw({ type: "application/json" }), asyncWrapper(stripeWebhook));
+
 app.use(cookieParser())
-app.use(express.urlencoded({extended:true,limit:'10mb'}))
 app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({extended:true,limit:'10mb'}))
 
 
 //api

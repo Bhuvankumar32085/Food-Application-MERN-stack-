@@ -113,7 +113,7 @@ export const getRestaurantOrder = async (req: Request, res: Response) => {
   }
 
   const orders = await Order.find({ restaurant: restaurant._id })
-    .populate("resturant")
+    .populate("restaurant")
     .populate("user");
 
   return res.status(200).json({
@@ -128,7 +128,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   const order = await Order.findById({ orderId });
 
   if (!order) {
-    return res.status(201).json({
+    return res.status(404).json({
       success: false,
       message: "Order not found",
     });
@@ -139,6 +139,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
 
   return res.status(200).json({
     success: true,
+    status:order.status,
     message: "status updated",
   });
   
