@@ -16,7 +16,6 @@ import {
 export const signup = async (req: Request, res: Response) => {
   const { fullname, email, password, contact } = req.body;
 
-  console.log(req.body);
   // Check if user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
@@ -89,7 +88,6 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const verifyEmail = async (req: Request, res: Response) => {
-  console.log("Verification Code:", req.body.otp.join(''));
   const user = await User.findOne({
     verificationToken: req.body.otp.join(''),
     verificationTokenExpiresAt: { $gt: new Date() },

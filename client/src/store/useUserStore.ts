@@ -54,7 +54,6 @@ export const useUserStore = create<UserState>()(
             withCredentials: true,
           });
           if (response.data.success) {
-            console.log("Signup successful:", response.data);
             toast.success(response.data.message);
             set({
               user: response.data.user,
@@ -81,7 +80,6 @@ export const useUserStore = create<UserState>()(
             withCredentials: true,
           });
           if (response.data.success) {
-            console.log("Login successful:", response.data);
             toast.success(response.data.message);
             set({
               user: response.data.user,
@@ -110,7 +108,6 @@ export const useUserStore = create<UserState>()(
             }
           );
           if (response.data.success) {
-            console.log("OTP verification successful:", response.data);
             toast.success(response.data.message);
             set({
               user: response.data.user,
@@ -160,7 +157,6 @@ export const useUserStore = create<UserState>()(
             }
           );
           if (response.data.success) {
-            console.log("Logout successful:", response.data);
             toast.success(response.data.message);
 
             set({
@@ -190,7 +186,6 @@ export const useUserStore = create<UserState>()(
             }
           );
           if (response.data.success) {
-            console.log("Forgot password successful:", response.data);
             toast.success(response.data.message);
             set({ loading: false });
           }
@@ -215,7 +210,6 @@ export const useUserStore = create<UserState>()(
             }
           );
           if (response.data.success) {
-            console.log("Reset password successful:", response.data);
             toast.success(response.data.message);
             set({ loading: false });
           }

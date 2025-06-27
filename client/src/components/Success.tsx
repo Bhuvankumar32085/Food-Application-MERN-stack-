@@ -9,7 +9,6 @@ const Success = () => {
   const { orders, getOrderDetails } = useOrderStore();
   useEffect(() => {
     getOrderDetails();
-    console.log(orders);
   }, []);
 
   if (orders.length === 0) {

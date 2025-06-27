@@ -18,6 +18,7 @@ import Success from "./components/Success";
 import { useUserStore } from "./store/useUserStore";
 import { Navigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useThemeStore } from "./store/useThemStore";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const {isAuthenticated, user} = useUserStore();
@@ -115,11 +116,13 @@ const appRouter = createBrowserRouter([
 ]);
 
 function App() {
+  const initializeTheme=useThemeStore((state:any)=>state.initializeTheme)
   const {checkAuntgentication,isCheckingAuth} = useUserStore();
 
   // Check authentication status on app load
   useEffect(() => {
     checkAuntgentication();
+    initializeTheme()
   }, [checkAuntgentication]);
 
   if (isCheckingAuth) {

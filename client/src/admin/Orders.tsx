@@ -12,7 +12,12 @@ import { useEffect } from "react";
 import { Card } from "@/components/ui/card";
 
 const Orders = () => {
-  const { getReataurantOrdes, updateRestaurantOrder, restaurantOrders } = useRestaurantStore();
+  const { getReataurantOrdes, updateRestaurantOrder, restaurantOrders } =
+    useRestaurantStore();
+
+  const handelStatuschange = async (id: string, status: string) => {
+    await updateRestaurantOrder(id, status);
+  };
 
   useEffect(() => {
     getReataurantOrdes();
@@ -26,7 +31,10 @@ const Orders = () => {
 
       <div className="space-y-8">
         {restaurantOrders.map((order, idx) => {
-          const totalAmount = order.cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+          const totalAmount = order.cartItems.reduce(
+            (acc, item) => acc + item.price * item.quantity,
+            0
+          );
 
           return (
             <Card
@@ -50,7 +58,7 @@ const Orders = () => {
                   {totalAmount}
                 </p>
 
-                <div className="mt-4">
+                {/* <div className="mt-4">
                   <h2 className="font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Items:
                   </h2>
@@ -67,7 +75,7 @@ const Orders = () => {
                       </span>
                     </div>
                   ))}
-                </div>
+                </div> */}
               </div>
 
               <div className="w-full sm:w-1/3">
@@ -76,7 +84,7 @@ const Orders = () => {
                 </Label>
                 <Select
                   onValueChange={(newStatus) =>
-                    updateRestaurantOrder(order._id, newStatus)
+                    handelStatuschange(order._id, newStatus)
                   }
                   defaultValue={order.status}
                 >

@@ -125,7 +125,8 @@ export const getRestaurantOrder = async (req: Request, res: Response) => {
 export const updateOrderStatus = async (req: Request, res: Response) => {
   const { orderId } = req.params;
   const { status } = req.body;
-  const order = await Order.findById({ orderId });
+  console.log(orderId,'--. in backend')
+  const order = await Order.findById( orderId );
 
   if (!order) {
     return res.status(404).json({

@@ -44,8 +44,10 @@ import { Separator } from "./ui/separator";
 import { useUserStore } from "@/store/useUserStore";
 import { useCartStore } from "@/store/useCartStore";
 import { useEffect } from "react";
+import { useThemeStore } from "@/store/useThemStore";
 
 const NavBar = () => {
+  const {setTheme}=useThemeStore()
   const { cart } = useCartStore();
   const { user, loading, logout } = useUserStore();
   return (
@@ -89,8 +91,8 @@ const NavBar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Light</DropdownMenuItem>
-                  <DropdownMenuItem>Dark</DropdownMenuItem>
+                  <DropdownMenuItem onClick={()=>setTheme('light')}>Light</DropdownMenuItem>
+                  <DropdownMenuItem onClick={()=>setTheme('dark')}>Dark</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -137,12 +139,9 @@ const NavBar = () => {
 export default NavBar;
 
 const MobileNevbar = () => {
+    const {setTheme}=useThemeStore()
   const { user, logout } = useUserStore();
-  useEffect(()=>{
-     console.log(';;;;',user)
-     console.log(';;;;',user?.profilePicture)
-     console.log(';;;;',user?.fullname)
-  },[])
+ 
   return (
     <Sheet>
       <SheetTrigger>
@@ -160,8 +159,8 @@ const MobileNevbar = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Light</DropdownMenuItem>
-              <DropdownMenuItem>Dark</DropdownMenuItem>
+              <DropdownMenuItem onClick={()=>setTheme('light')}>Light</DropdownMenuItem>
+              <DropdownMenuItem onClick={()=>setTheme('dark')}>Dark</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </SheetHeader>

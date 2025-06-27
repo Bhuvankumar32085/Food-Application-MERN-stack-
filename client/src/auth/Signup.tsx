@@ -37,7 +37,6 @@ const Signup = () => {
       seterrors(fieldError as Partial<SignupType>);
       return;
     }
-    console.log(input);
     //signup api implementation start here
     try {
       await signup(input);

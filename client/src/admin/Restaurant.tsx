@@ -36,7 +36,6 @@ const Restaurant = () => {
     e.preventDefault();
     const result = restaurantFromSchema.safeParse(input);
     if (!result.success) {
-      //   console.log(result.error.format());
       setError(
         result.error.formErrors.fieldErrors as Partial<RestaurantFormSchema>
       );
@@ -88,7 +87,6 @@ const Restaurant = () => {
       };
       }
     fetchRestaurant();
-    // console.log('resturant ====>>',restaurant);
     
   }, []);
 

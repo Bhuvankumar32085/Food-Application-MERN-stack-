@@ -39,7 +39,6 @@ const VerifyEmail = () => {
     const enteredOtp = otp.join("");
 
     if (enteredOtp.length === 6) {
-      console.log("OTP Verified:", enteredOtp);
       // ✅ API call yahan karo
       try {
         await verifyEmail(otp);

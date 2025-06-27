@@ -50,7 +50,6 @@ const AddMenu = () => {
       setError(fieldError as Partial<MenuSchema>);
       return;
     }
-    console.log(input);
     //api implementations
     const formData = new FormData();
     formData.append("name", input.name);

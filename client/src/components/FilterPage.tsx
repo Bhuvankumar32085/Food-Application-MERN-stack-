@@ -12,7 +12,7 @@ const filterOptions: FilterOptionsState[] = [
   { id: "burger", label: "Burger" },
   { id: "thali", label: "Thali" },
   { id: "biryani", label: "Biryani" },
-  { id: "momos", label: "Momos" },
+  { id: "momos", label: "momos" },
   { id: "sandwich", label: "sandwich" },
   { id: "toast", label: "toast" },
 ];

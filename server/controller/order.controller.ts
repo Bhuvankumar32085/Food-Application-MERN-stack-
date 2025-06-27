@@ -45,8 +45,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
     const restaurant = await Restaurant.findById(
       checkoutSessionRequest.restaurantId
     ).populate("menus");
-    // console.log(checkoutSessionRequest)
-    // console.log(restaurant)
+   
     if (!restaurant) {
       return res.status(404).json({
         success: false,
